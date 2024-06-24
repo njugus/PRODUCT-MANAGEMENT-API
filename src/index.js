@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/products", userRoutes);
+// app.use("/products", userRoutes);
 
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
