@@ -3,7 +3,7 @@ Made By Kelvin Njuguna
 
 # Product Management API
 
-This RESTful API allows clients to manage a collection of products stored in a PostgreSQL database. It supports CRUD (Create, Read, Update, Delete) operations on products.
+This RESTful API allows clients to manage a collection of products stored in a PostgreSQL database using Prisma as the ORM. It supports CRUD (Create, Read, Update, Delete) operations on products.
 
 ## Table of Contents
 
@@ -37,22 +37,43 @@ To run this project locally, follow these steps:
 
    - Ensure PostgreSQL is installed and running on your machine.
    - Create a new database for this project.
-   - Use the provided SQL script to create the `products` table:
+   - Set up your `.env` file with the database URL:
 
-     ```sql
-     CREATE TABLE products (
-       product_id SERIAL PRIMARY KEY,
-       productThumbnail VARCHAR(500) NOT NULL,
-       productTitle VARCHAR(50) NOT NULL,
-       productDescription TEXT NOT NULL,
-       productCost VARCHAR(50) NOT NULL,
-       onOffer BOOLEAN NOT NULL
-     );
+     ```env
+     DATABASE_URL="postgresql://user:password@localhost:5432/your-database-name"
      ```
 
-   - Optionally, insert some initial data into the `products` table.
+   - Generate Prisma client and set up the database schema:
 
+     ```bash
+     npx prisma init
+     npx prisma migrate dev --name init
+     npx prisma generate
+     ```
 
+4. **Create the `Product` model in Prisma schema**:
+
+   Add the following to your `prisma/schema.prisma` file:
+
+   ```prisma
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+
+   generator client {
+     provider = "prisma-client-js"
+   }
+
+   model Product {
+     id                 String   @id @default(uuid())
+     productThumbnail   String   @db.VarChar(500)
+     productTitle       String   @db.VarChar(50)
+     productDescription String   @db.Text
+     productCost        String   @db.VarChar(50)
+     onOffer            Boolean
+   }
+   ```
 
 5. **Start the server**:
 
@@ -68,7 +89,7 @@ Retrieves a list of all products from the database.
 
 ### GET /products/:id
 
-Retrieves a single product from the database based on its `product_id`.
+Retrieves a single product from the database based on its `id`.
 
 ### POST /products
 
@@ -76,11 +97,11 @@ Creates a new product and adds it to the database.
 
 ### PATCH /products/:id
 
-Updates an existing product based on its `product_id`.
+Updates an existing product based on its `id`.
 
 ### DELETE /products/:id
 
-Deletes a product from the database based on its `product_id`.
+Deletes a product from the database based on its `id`.
 
 ## Running the Project
 
@@ -96,3 +117,11 @@ Ensure that PostgreSQL is running and your database is set up correctly with the
 
 3. Refer to the endpoint descriptions above for detailed usage of each API endpoint.
 
+---
+
+### Example Code for Endpoints
+
+Here is how the routes could be implemented with Prisma in your Express app:
+
+
+This implementation ensures your API uses Prisma to interact with a PostgreSQL database, providing a robust and maintainable way to manage product data.
